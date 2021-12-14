@@ -8,6 +8,8 @@ using Random
 using Parameters
 using DataStructures
 using LinearAlgebra
+using POMDPLinter: @show_requirements, requirements_info, @POMDP_require, @req, @subreq
+import POMDPLinter
 
 export
     GapHeuristicSearchSolver,

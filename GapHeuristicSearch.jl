@@ -106,10 +106,19 @@ function POMDPs.solve(solver::GapHeuristicSearchSolver, pomdp::POMDP)
     return GapHeuristicSearchPlanner{B,A,O}(pomdp=pomdp,solver=solver,root=root)
 end
 
+@POMDP_require solve(solver::GapHeuristicSearchSolver,pomdp::POMDP) begin
+    M = typeof(pomdp)
+    S = statetype(pomdp)
+    A = actiontype(pomdp)
+    U = typeof(solver.up)
+    @req initialize_belief(::U,::S)
+    @req initialstate(::M)
+end
+
 POMDPs.updater(planner::GapHeuristicSearchPlanner) = planner.solver.up
 
 """
-Generate montecaro obervation, rewards bares from an initial state b. No weighting/combining done in this method.
+Generate montecaro obervation, rewards pairs from an initial state b. No weighting/combining done in this method.
 """
 function montecarlo_ors(pomdp::POMDP,b,a,nsamps::Int64)
     outputs = [@gen(:o,:r)(pomdp, rand(b), a) for _ in 1:nsamps]
@@ -254,4 +263,16 @@ function POMDPs.action(planner::GapHeuristicSearchPlanner, b)
     # return the best action accoridng to 1-step lookahead with the lower bound on belief state value
     a =  argmax(a -> lookahead(pomdp,bn -> bn.Ulo,root,a),root.as) 
     return a
+end
+
+@POMDP_require POMDPs.action(planner::GapHeuristicSearchPlanner, b) begin
+    M = typeof(planner.pomdp)
+    S = statetype(planner.pomdp)
+    (B,A,O) = get_type(planner)
+    U = typeof(planner.solver.up)
+
+    @req actions(::M,::B)
+    @req update(::U,::B,::A,::O)
+    # @req @gen(:o,:r)(::M, ::S, ::A)
+    @req gen(::M, ::S, ::A, ::AbstractRNG)
 end
