@@ -8,7 +8,7 @@ In Julia, type `]add MCTS`
 TODO
 
 ## Usage
-
+```julia
 If `pomdp` is a POMDP defined with the [POMDPs.jl](https://github.com/sisl/POMDPs.jl) interface, the GHS solver can be used to find an optimized action, `a`, for the POMDP in belief state `b` as follows:
 
 using POMDPs
@@ -16,11 +16,6 @@ using POMDPModels # for the CryingBaby problem
 using POMDPPolicies
 using BeliefUpdaters
 using GHS
-
-mdp = SimpleGridWorld()
-solver = MCTSSolver(n_iterations=50, depth=20, exploration_constant=5.0)
-planner = solve(solver, mdp)
-a = action(planner, SA[1,2])
 
 pomdp = BabyPOMDP()
 roller = RandomPolicy(pomdp)
@@ -32,3 +27,4 @@ ghs_policy = solve(solver, cryingbaby)
 b_hungry = DiscreteBelief(cryingbaby,[.1,.9])
 
 a = action(ghs_policy, b_hungry)
+```
