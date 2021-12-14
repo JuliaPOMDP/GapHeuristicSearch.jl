@@ -21,7 +21,15 @@ pomdp = BabyPOMDP()
 roller = RandomPolicy(pomdp)
 up = DiscreteUpdater(pomdp)
 Rmax = 0.0  # best possible reward is baby not hungry, didnt feed
-solver = GapHeuristicSearchSolver(roller,up,Rmax,delta=.1,k_max=100,d_max=10,nsamps=10,max_steps=20,verbose=false)
+solver = GapHeuristicSearchSolver(roller,
+                                up,
+                                Rmax,
+                                delta=.1,
+                                k_max=100,
+                                d_max=10,
+                                nsamps=10,
+                                max_steps=20)
+                                
 ghs_policy = solve(solver, cryingbaby)
 
 b_hungry = DiscreteBelief(cryingbaby,[.1,.9])
