@@ -8,20 +8,12 @@ push!(LOAD_PATH,"/Users/ericlux/Desk/GHS.jl")
 using GHS
 
 cryingbaby = BabyPOMDP()
-roller = RandomPolicy(cryingbaby)
-up = DiscreteUpdater(cryingbaby)
-Rmax = 0.0  # best possible reward is baby not hungry, didnt feed
-solver = GapHeuristicSearchSolver(roller,
-                                up,
-                                Rmax,
-                                delta=.1,
-                                k_max=500,
-                                d_max=7,
-                                nsamps=20,
-                                max_steps=10)
-
+solver = GapHeuristicSearchSolver(DiscreteUpdater(cryingbaby),
+                                Rmax=0.0,  # best possible reward is baby not hungry, didnt feed
+                                π=RandomPolicy(cryingbaby))
 ghs_policy = solve(solver, cryingbaby)
 b_hungry = DiscreteBelief(cryingbaby,[.1,.9])
+
 println("action: ",action(ghs_policy, b_hungry))
 
 # Use POMDPLinter to view requirements for `solve` and `action`

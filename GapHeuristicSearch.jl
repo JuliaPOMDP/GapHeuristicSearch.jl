@@ -14,10 +14,10 @@ end
 """
 GHS solver type
 Fields:
-    π::Union{Policy,Nothing}
-        Rollout policy, if nothing must implement ulo_func.
     up::Updater
         Updater of type POMDPs.Updater
+    π::Union{Policy,Nothing}
+        Rollout policy, if nothing must implement ulo_func. Used if ulo_func is nothing.
     uhi_func                    
         Upper bound on belief value function. Function takes in the POMDP and the current belief.
         default: nothing
@@ -25,7 +25,7 @@ Fields:
         Lower bound on belief value function. Function takes in the POMDP and the current belief.
         default: nothing
     Rmax::Float64               
-        Max reward, for the best action best state upper bound.
+        Max reward, for the best action best state upper bound. Used if uhi_func is nothing
     delta::Float64
         Gap threshold. Exploration stops once the gap in bounds at a belief is below the threshold.
         default: 1e-2
@@ -46,8 +46,8 @@ Fields:
         default: false
 """
 struct GapHeuristicSearchSolver <: Solver
-    π::Union{Policy,Nothing}    # rollout policy, TBD if more flexibility for lower bound
     up::Updater                 # updater
+    π::Union{Policy,Nothing}    # rollout policy, TBD if more flexibility for lower bound
     uhi_func                    # upper bound on belief value function
     ulo_func                    # lower bound on belief value function
     Rmax::Float64               # max reward
@@ -64,9 +64,9 @@ end
 
 Use keyword arguments to specify values for the fields.
 """
-function GapHeuristicSearchSolver(π::Union{Policy,Nothing},
-                                up::Updater, 
-                                Rmax::Float64; 
+function GapHeuristicSearchSolver(up::Updater;
+                                π::Union{Policy,Nothing}=nothing,
+                                Rmax::Float64=-Inf, 
                                 uhi_func=nothing,
                                 ulo_func=nothing,
                                 delta::Float64=1e-2,
@@ -75,7 +75,12 @@ function GapHeuristicSearchSolver(π::Union{Policy,Nothing},
                                 nsamps::Int64=20,
                                 max_steps=100,
                                 verbose=false)
-    return GapHeuristicSearchSolver(π,up,uhi_func,ulo_func,Rmax,delta,k_max,d_max,nsamps,max_steps,verbose)
+    if uhi_func === nothing && Rmax == -Inf
+        error("Both uhi_func and Rmax un-implemented. Need one to be non-nothing.")
+    elseif  ulo_func === nothing && π === nothing
+        error("Both ulo_func and roller un-implemented. Need one to be non-nothing.")
+    end
+    return GapHeuristicSearchSolver(up,π,uhi_func,ulo_func,Rmax,delta,k_max,d_max,nsamps,max_steps,verbose)
 end
 
 """
