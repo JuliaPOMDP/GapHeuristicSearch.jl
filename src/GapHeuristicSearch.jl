@@ -1,4 +1,4 @@
-module GHS
+module GapHeuristicSearch
 
 using POMDPs
 using POMDPModelTools
@@ -18,6 +18,6 @@ export
     action,
     get_type
 
-include("GapHeuristicSearch.jl")
+include("search.jl")
 
 end # module
