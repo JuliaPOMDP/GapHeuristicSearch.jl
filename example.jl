@@ -3,8 +3,8 @@ using POMDPPolicies
 using POMDPSimulators
 using POMDPModels
 using BeliefUpdaters
-push!(LOAD_PATH,"/Users/ericlux/Desk/GHS.jl")
-using GHS
+
+using GapHeuristicSearch
 
 cryingbaby = BabyPOMDP()
 solver = GapHeuristicSearchSolver(DiscreteUpdater(cryingbaby),
