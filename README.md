@@ -5,8 +5,16 @@ A Julia implementation of the Gap Heuristic Search online planning algorithm, fo
 In Julia, type `]add MCTS`
 
 ## Documentation
-TODO
-
+The difference between the gap at a belief b is defined as the difference between the upper and lower bound values: U<sub>upper</sub>(b)-U<sub>lower</sub>(b).
+The upper bound will be initalized by the best-action best-state upper bound if not specificed, and the lower bound will be initialized by the reward obtained by a random rollout policy if not specified.
+The Gap Heuristic Search algorithm seeks to select the obeservation that maximizes the gap of belief b becaause they are more likely to benefit from a belief backup.
+Actions will be selected with a lookahead using an approximate value function.
+```julia
+a = argmax(a -> lookahead(𝒫,b′->Uhi[b′],b,a),𝒜) # find the action that maximizes the lookahead function
+o = argmax(o -> Uhi[B[(a,o)]] - Ulo[B[(a,o)]], 𝒪) # find the observation that maximizes the gap between the upper and lower bound
+```
+The exploration stops when the gap is smaller than the threshold $\delta$ or the maximum depth
+is reached. 
 ## Usage
 ```julia
 If `pomdp` is a POMDP defined with the [POMDPs.jl](https://github.com/sisl/POMDPs.jl) interface, the GHS solver can be used to find an optimized action, `a`, for the POMDP in belief state `b` as follows:
