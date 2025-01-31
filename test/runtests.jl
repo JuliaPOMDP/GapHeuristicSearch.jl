@@ -1,12 +1,11 @@
 using Test
 using GapHeuristicSearch
 using POMDPs
-using POMDPModelTools
+using POMDPTools
 
 # Define simple test POMDP type
 struct SimplePOMDP <: POMDP{Int, Int, Int} end
 
-# Required basic methods for SimplePOMDP
 POMDPs.states(::SimplePOMDP) = [1, 2]
 POMDPs.actions(::SimplePOMDP) = [1, 2]
 POMDPs.observations(::SimplePOMDP) = [1, 2]
@@ -16,14 +15,12 @@ POMDPs.transition(::SimplePOMDP, s, a) = Deterministic(s)
 POMDPs.observation(::SimplePOMDP, a, sp) = Deterministic(a)
 POMDPs.reward(::SimplePOMDP, s, a, sp) = 1.0
 
-# Updated basic updater for testing clearly without nested Deterministic
+# Simple updater for deterministic belief handling
 struct SimpleUpdater <: Updater end
-POMDPs.initialize_belief(::SimpleUpdater, state) = state  # corrected line
+POMDPs.initialize_belief(::SimpleUpdater, state) = state
 POMDPs.update(::SimpleUpdater, b, a, o) = b
 
 @testset "GapHeuristicSearch.jl Basic Tests" begin
-
-    # Solver initialization test
     solver = GapHeuristicSearchSolver(
         SimpleUpdater();
         π = nothing,
@@ -38,41 +35,20 @@ POMDPs.update(::SimpleUpdater, b, a, o) = b
     )
 
     @test isa(solver, GapHeuristicSearchSolver)
-
-    # Solver parameters clearly checked
     @test solver.Rmax == 10.0
     @test solver.delta == 0.01
     @test solver.d_max == 5
 
-    # Solve simple POMDP explicitly
-    planner = nothing
-    try
-        pomdp = SimplePOMDP()
-        planner = solve(solver, pomdp)
-        @test isa(planner, GapHeuristicSearchPlanner)
-    catch e
-        @warn "Solver failed: $e" exception=(e, catch_backtrace())
-        @test false
-    end
+    pomdp = SimplePOMDP()
+    planner = solve(solver, pomdp)
+    @test isa(planner, GapHeuristicSearchPlanner)
 
-    # Check planner type consistency and action function
-    if planner !== nothing
-        # Test get_type
-        B, A, O = get_type(planner)
-        @test B == Deterministic{Int}
-        @test A == Int
-        @test O == Int
+    B, A, O = get_type(planner)
+    @test B == Deterministic{Int}
+    @test A == Int
+    @test O == Int
 
-        # Corrected action test without nested Deterministic issue
-        b = Deterministic(1)
-        try
-            a = action(planner, b)
-            @test isa(a, Int)
-        catch e
-            @warn "Action function failed: $e" exception=(e, catch_backtrace())
-            @test false
-        end
-    else
-        @warn "Planner initialization failed, skipping further tests."
-    end
+    b = Deterministic(1)
+    a = action(planner, b)
+    @test isa(a, Int)
 end
