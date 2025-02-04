@@ -17,20 +17,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Julia
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'
+          version: "1.9"
 
       - name: Update Julia Registries
         run: julia -e 'using Pkg; Pkg.Registry.update()'
 
       - name: Install Dependencies
-        run: |
-          julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
+        run: julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
       - name: Add Coverage Dependency
-        run: |
-          julia --project -e 'using Pkg; Pkg.add("Coverage")'
+        run: julia --project -e 'using Pkg; Pkg.add("Coverage")'
 
       - name: Run Tests and Generate Coverage
         run: |
