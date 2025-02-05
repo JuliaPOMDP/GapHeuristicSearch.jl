@@ -17,9 +17,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Julia
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@v2
         with:
-          version: "1.9"
+          version: '1.9'
 
       - name: Update Julia Registries
         run: julia -e 'using Pkg; Pkg.Registry.update()'
@@ -36,8 +36,7 @@ jobs:
             using Pkg;
             Pkg.test(coverage=true);
             using Coverage;
-            LCOV.writefile("lcov.info", process_folder("."))
-          '
+            LCOV.writefile("lcov.info", process_folder("."))'
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
