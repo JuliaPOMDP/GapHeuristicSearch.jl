@@ -34,13 +34,20 @@ jobs:
         run: |
           julia --project -e '
             using Pkg;
-            Pkg.test(coverage=true);
-            using Coverage;
-            LCOV.writefile("lcov.info", process_folder("."))'
+            Pkg.instantiate();
+            Pkg.add([
+              "POMDPs", 
+              "POMDPModelTools", 
+              "POMDPPolicies", 
+              "POMDPSimulators",
+              "Random",
+              "Parameters",
+              "DataStructures",
+              "LinearAlgebra",
+              "POMDPLinter",
+              "Test"
+            ]);
+            Pkg.precompile()'
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: Aero-Spec/GapHeuristicSearch.jl
-          files: lcov.info
+      - name: Run tests
+        run: julia --project=. -e 'using Pkg; Pkg.test()'
