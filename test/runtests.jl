@@ -1,14 +1,8 @@
 using Test
 using POMDPs
-using POMDPModelTools
-using POMDPPolicies
-using POMDPSimulators
-using Random 
-using Test
-
-# Import the module (assume it is in the same directory or included)
-include("GapHeuristicSearch.jl")
-using .GapHeuristicSearch
+using POMDPTools
+using Random
+using GapHeuristicSearch
 
 # Define a Simple POMDP for testing
 struct SimplePOMDP <: POMDP{Int, Int, Int} end
