@@ -2,24 +2,43 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Julia
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@v2
         with:
-          version: "1.9"
+          version: '1.9'
 
       - name: Install dependencies
-        run: julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        run: |
+          julia -e '
+            using Pkg;
+            Pkg.instantiate();
+            Pkg.add([
+              "POMDPs", 
+              "POMDPModelTools", 
+              "POMDPPolicies", 
+              "POMDPSimulators",
+              "Random",
+              "Parameters",
+              "DataStructures",
+              "LinearAlgebra",
+              "POMDPLinter",
+              "Test"
+            ]);
+            Pkg.precompile()'
 
       - name: Run tests
-        run: julia --project -e 'using Pkg; Pkg.test()'
+        run: julia --project=. -e 'using Pkg; Pkg.test()'
