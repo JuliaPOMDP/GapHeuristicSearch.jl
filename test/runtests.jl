@@ -1,8 +1,6 @@
 using Test
 using POMDPs
-using POMDPModelTools
-using POMDPPolicies
-using POMDPSimulators
+using POMDPTools
 using Random
 using GapHeuristicSearch
 
