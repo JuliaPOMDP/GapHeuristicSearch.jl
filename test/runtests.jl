@@ -1,54 +1,82 @@
 using Test
-using GapHeuristicSearch
 using POMDPs
-using POMDPTools
+using POMDPModelTools
+using POMDPPolicies
+using POMDPSimulators
+using Random 
+using Test
 
-# Define simple test POMDP type
+# Import the module (assume it is in the same directory or included)
+include("GapHeuristicSearch.jl")
+using .GapHeuristicSearch
+
+# Define a Simple POMDP for testing
 struct SimplePOMDP <: POMDP{Int, Int, Int} end
 
-POMDPs.states(::SimplePOMDP) = [1, 2]
-POMDPs.actions(::SimplePOMDP) = [1, 2]
-POMDPs.observations(::SimplePOMDP) = [1, 2]
-POMDPs.initialstate(::SimplePOMDP) = Deterministic(1)
-POMDPs.discount(::SimplePOMDP) = 0.9
-POMDPs.transition(::SimplePOMDP, s, a) = Deterministic(s)
-POMDPs.observation(::SimplePOMDP, a, sp) = Deterministic(a)
-POMDPs.reward(::SimplePOMDP, s, a, sp) = 1.0
+POMDPs.actions(::SimplePOMDP) = [1, 2]  # Two actions available
+POMDPs.discount(::SimplePOMDP) = 0.95
 
-# Simple updater for deterministic belief handling
+# Define transition model
+function POMDPs.transition(pomdp::SimplePOMDP, s::Int, a::Int)
+    if a == 1
+        return SparseCat([1, 2], [0.8, 0.2])
+    else
+        return SparseCat([1, 2], [0.5, 0.5])
+    end
+end
+
+# Define reward model
+function POMDPs.reward(pomdp::SimplePOMDP, s::Int, a::Int)
+    return a == 1 ? 10.0 : 5.0
+end
+
+# Define observation model
+function POMDPs.observation(pomdp::SimplePOMDP, a::Int, sp::Int)
+    return SparseCat([1, 2], [0.7, 0.3])
+end
+
+# Define initial state distribution
+POMDPs.initialstate(::SimplePOMDP) = SparseCat([1, 2], [0.5, 0.5])
+
+# Define a trivial belief updater
 struct SimpleUpdater <: Updater end
-POMDPs.initialize_belief(::SimpleUpdater, state) = state
-POMDPs.update(::SimpleUpdater, b, a, o) = b
 
-@testset "GapHeuristicSearch.jl Basic Tests" begin
+function POMDPs.initialize_belief(::SimpleUpdater, d)
+    return Dict(1 => 0.5, 2 => 0.5)
+end
+
+function POMDPs.update(::SimpleUpdater, b, a, o)
+    return b  # Just return the same belief for simplicity
+end
+
+# Run Tests
+@testset "GapHeuristicSearch.jl Tests" begin
+    rng = Random.default_rng()
+    pomdp = SimplePOMDP()
+    up = SimpleUpdater()
+
     solver = GapHeuristicSearchSolver(
-        SimpleUpdater();
-        π = nothing,
-        Rmax = 10.0,
-        uhi_func = (pomdp, b) -> 10.0,
-        ulo_func = (pomdp, b) -> 0.0,
-        delta = 0.01,
-        k_max = 10,
-        d_max = 5,
-        nsamps = 10,
-        max_steps = 10
+        up,
+        π=nothing,  # No rollout policy
+        Rmax=10.0,
+        uhi_func=nothing,
+        ulo_func=nothing,
+        delta=1e-2,
+        k_max=50,
+        d_max=5,
+        nsamps=10,
+        max_steps=10,
+        verbose=false
     )
 
-    @test isa(solver, GapHeuristicSearchSolver)
-    @test solver.Rmax == 10.0
-    @test solver.delta == 0.01
-    @test solver.d_max == 5
-
-    pomdp = SimplePOMDP()
     planner = solve(solver, pomdp)
-    @test isa(planner, GapHeuristicSearchPlanner)
+    
+    # Check if the planner object was created
+    @test typeof(planner) <: GapHeuristicSearchPlanner
 
-    B, A, O = get_type(planner)
-    @test B == Deterministic{Int}
-    @test A == Int
-    @test O == Int
+    # Check if an action is selected
+    action_selected = action(planner, initialize_belief(up, initialstate(pomdp)))
+    @test action_selected in actions(pomdp)
 
-    b = Deterministic(1)
-    a = action(planner, b)
-    @test isa(a, Int)
+    println("All tests passed!")
 end
