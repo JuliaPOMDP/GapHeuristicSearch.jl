@@ -34,19 +34,9 @@ jobs:
         run: |
           julia --project -e '
             using Pkg;
+            Pkg.develop(path="."); # Ensures local package is available
             Pkg.instantiate();
-            Pkg.add([
-              "POMDPs", 
-              "POMDPModelTools", 
-              "POMDPPolicies", 
-              "POMDPSimulators",
-              "Random",
-              "Parameters",
-              "DataStructures",
-              "LinearAlgebra",
-              "POMDPLinter",
-              "Test"
-            ]);
+            Pkg.add(["Test", "POMDPs", "POMDPTools", "Random"]);
             Pkg.precompile()'
 
       - name: Run tests
