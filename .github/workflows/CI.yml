@@ -27,8 +27,11 @@ jobs:
             using Pkg;
             Pkg.develop(path="."); # Ensures local package is available
             Pkg.instantiate();
-            Pkg.add(["Test", "POMDPs", "POMDPTools", "Random"]);
+            Pkg.add(["Test", "POMDPs", "POMDPTools", "Random", "GapHeuristicSearch"]);
             Pkg.precompile()'
 
       - name: Run tests
-        run: julia --project=. -e 'using Pkg; Pkg.test()'
+        run: julia --project=. -e '
+          using Pkg;
+          Pkg.activate(".");
+          Pkg.test()'
