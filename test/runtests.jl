@@ -1,6 +1,6 @@
 using Test
 using POMDPs
-using POMDPTools
+using POMDPModelTools
 using Random
 using GapHeuristicSearch
 
@@ -30,9 +30,9 @@ POMDPs.update(::SimpleUpdater, b, a, o) = Deterministic(o)
     @test planner isa GapHeuristicSearchPlanner
     
     belief = initialize_belief(updater, initialstate(pomdp))
-    action = action(planner, belief)
+    chosen_action = action(planner, belief)
     
-    @test action in actions(pomdp)
+    @test chosen_action in actions(pomdp)
     
     println("All tests passed!")
 end
