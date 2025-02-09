@@ -28,10 +28,19 @@ jobs:
           julia-${{ runner.os }}-
 
     - name: Install dependencies
-      run: julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+      run: julia --project=. -e '
+        import Pkg;
+        Pkg.Registry.add("General");
+        Pkg.add(url="https://github.com/JuliaPOMDP/POMDPTools.jl");
+        Pkg.instantiate();
+        Pkg.precompile();'
 
     - name: Run tests
       run: julia --project=. -e 'using Pkg; Pkg.test()'
 
     - name: Check Julia formatting
-      run: julia --project=. -e 'using Pkg; Pkg.add("JuliaFormatter"); using JuliaFormatter; format(".")'
+      run: julia --project=. -e '
+        using Pkg;
+        Pkg.add("JuliaFormatter");
+        using JuliaFormatter;
+        format(".");'
