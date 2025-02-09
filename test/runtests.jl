@@ -1,76 +1,47 @@
 using Test
 using POMDPs
-using POMDPTools
+using POMDPModelTools
+using POMDPPolicies
+using POMDPSimulators
 using Random
 using GapHeuristicSearch
 
-# Define a Simple POMDP for testing
-struct SimplePOMDP <: POMDP{Int, Int, Int} end
+# Define a simple POMDP model for testing
+struct TestPOMDP <: POMDPs.POMDP{Int, Int, Int} end
 
-POMDPs.actions(::SimplePOMDP) = [1, 2]  # Two actions available
-POMDPs.discount(::SimplePOMDP) = 0.95
+POMDPs.states(::TestPOMDP) = 1:2
+POMDPs.actions(::TestPOMDP) = [1, 2]
+POMDPs.observations(::TestPOMDP) = [1, 2]
+POMDPs.transition(::TestPOMDP, s, a) = SparseCat([1, 2], [0.5, 0.5])
+POMDPs.observation(::TestPOMDP, s′, a) = SparseCat([1, 2], [0.5, 0.5])
+POMDPs.reward(::TestPOMDP, s, a) = 1.0
+POMDPs.initialstate(::TestPOMDP) = SparseCat([1, 2], [0.5, 0.5])
+POMDPs.discount(::TestPOMDP) = 0.9
 
-# Define transition model
-function POMDPs.transition(pomdp::SimplePOMDP, s::Int, a::Int)
-    if a == 1
-        return SparseCat([1, 2], [0.8, 0.2])
-    else
-        return SparseCat([1, 2], [0.5, 0.5])
-    end
-end
+@testset "GapHeuristicSearch Tests" begin
+    # Create a test POMDP
+    pomdp = TestPOMDP()
 
-# Define reward model
-function POMDPs.reward(pomdp::SimplePOMDP, s::Int, a::Int)
-    return a == 1 ? 10.0 : 5.0
-end
+    # Define a basic updater and policy
+    struct TestUpdater <: Updater end
+    struct TestPolicy <: Policy end
 
-# Define observation model
-function POMDPs.observation(pomdp::SimplePOMDP, a::Int, sp::Int)
-    return SparseCat([1, 2], [0.7, 0.3])
-end
+    POMDPs.update(::TestUpdater, b, a, o) = b
+    POMDPs.action(::TestPolicy, b) = 1
 
-# Define initial state distribution
-POMDPs.initialstate(::SimplePOMDP) = SparseCat([1, 2], [0.5, 0.5])
+    up = TestUpdater()
+    π = TestPolicy()
 
-# Define a trivial belief updater
-struct SimpleUpdater <: Updater end
+    # Create the solver
+    solver = GapHeuristicSearchSolver(up, π=π, Rmax=10.0, delta=0.01, k_max=100, d_max=5, nsamps=10, max_steps=50, verbose=false)
 
-function POMDPs.initialize_belief(::SimpleUpdater, d)
-    return Dict(1 => 0.5, 2 => 0.5)
-end
-
-function POMDPs.update(::SimpleUpdater, b, a, o)
-    return b  # Just return the same belief for simplicity
-end
-
-# Run Tests
-@testset "GapHeuristicSearch.jl Tests" begin
-    rng = Random.default_rng()
-    pomdp = SimplePOMDP()
-    up = SimpleUpdater()
-
-    solver = GapHeuristicSearchSolver(
-        up,
-        π=nothing,  # No rollout policy
-        Rmax=10.0,
-        uhi_func=nothing,
-        ulo_func=nothing,
-        delta=1e-2,
-        k_max=50,
-        d_max=5,
-        nsamps=10,
-        max_steps=10,
-        verbose=false
-    )
-
+    # Solve the POMDP
     planner = solve(solver, pomdp)
+
+    # Ensure the solver returns a valid policy
+    @test isa(planner, GapHeuristicSearchPlanner)
     
-    @test planner isa GapHeuristicSearchPlanner
-    
-    belief = initialize_belief(updater, initialstate(pomdp))
-    chosen_action = action(planner, belief)
-    
-    @test chosen_action in actions(pomdp)
-    
-    println("All tests passed!")
+    # Test action selection
+    action_result = action(planner, initialstate(pomdp))
+    @test action_result in actions(pomdp)
 end
