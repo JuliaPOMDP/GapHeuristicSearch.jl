@@ -1,6 +1,6 @@
 using Test
 using POMDPs
-using POMDPTools
+using POMDPModelTools
 using Random
 using GapHeuristicSearch
 
@@ -65,12 +65,12 @@ end
 
     planner = solve(solver, pomdp)
     
-    # Check if the planner object was created
-    @test typeof(planner) <: GapHeuristicSearchPlanner
-
-    # Check if an action is selected
-    action_selected = action(planner, initialize_belief(up, initialstate(pomdp)))
-    @test action_selected in actions(pomdp)
-
+    @test planner isa GapHeuristicSearchPlanner
+    
+    belief = initialize_belief(updater, initialstate(pomdp))
+    chosen_action = action(planner, belief)
+    
+    @test chosen_action in actions(pomdp)
+    
     println("All tests passed!")
 end
