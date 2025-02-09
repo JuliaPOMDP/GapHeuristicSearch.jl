@@ -5,42 +5,26 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up Julia
-      uses: julia-actions/setup-julia@v2
-      with:
-        version: '1.9'
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.9'
 
-    - name: Restore cached Julia packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.julia/artifacts
-        key: julia-${{ runner.os }}-${{ hashFiles('**/Project.toml', '**/Manifest.toml') }}
-        restore-keys: |
-          julia-${{ runner.os }}-
+      - name: Install Dependencies
+        run: |
+          julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 
-    - name: Install dependencies
-      run: julia --project=. -e '
-        import Pkg;
-        Pkg.Registry.add("General");
-        Pkg.add(url="https://github.com/JuliaPOMDP/POMDPTools.jl");
-        Pkg.instantiate();
-        Pkg.precompile();'
-
-    - name: Run tests
-      run: julia --project=. -e 'using Pkg; Pkg.test()'
-
-    - name: Check Julia formatting
-      run: julia --project=. -e '
-        using Pkg;
-        Pkg.add("JuliaFormatter");
-        using JuliaFormatter;
-        format(".");'
+      - name: Run Tests
+        run: |
+          julia -e 'using Pkg; Pkg.test()'
