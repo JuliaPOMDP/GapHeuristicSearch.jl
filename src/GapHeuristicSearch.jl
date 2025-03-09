@@ -1,7 +1,8 @@
 module GapHeuristicSearch
 
 using POMDPs
-using POMDPTools  # Replaced POMDPModelTools and POMDPPolicies
+using POMDPModelTools
+using POMDPPolicies
 using POMDPSimulators
 using Random
 using Parameters
