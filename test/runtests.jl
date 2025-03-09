@@ -1,13 +1,12 @@
 using Test
 using POMDPs
-using POMDPModelTools
-using POMDPPolicies
+using POMDPTools
 using POMDPSimulators
 using Random
 using GapHeuristicSearch
 
-# Define a simple POMDP model for testing
-struct TestPOMDP <: POMDPs.POMDP{Int, Int, Int} end
+# Define a simple test POMDP model
+struct TestPOMDP <: POMDP{Int, Int, Int} end
 
 POMDPs.states(::TestPOMDP) = 1:2
 POMDPs.actions(::TestPOMDP) = [1, 2]
@@ -22,7 +21,7 @@ POMDPs.discount(::TestPOMDP) = 0.9
     # Create a test POMDP
     pomdp = TestPOMDP()
 
-    # Define a basic updater and policy
+    # Define a simple updater and policy
     struct TestUpdater <: Updater end
     struct TestPolicy <: Policy end
 
@@ -38,9 +37,9 @@ POMDPs.discount(::TestPOMDP) = 0.9
     # Solve the POMDP
     planner = solve(solver, pomdp)
 
-    # Ensure the solver returns a valid policy
+    # Ensure the solver returns a valid planner
     @test isa(planner, GapHeuristicSearchPlanner)
-    
+
     # Test action selection
     action_result = action(planner, initialstate(pomdp))
     @test action_result in actions(pomdp)
