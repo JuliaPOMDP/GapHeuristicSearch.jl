@@ -1,4 +1,4 @@
-Project.toml name = "GapHeuristicSearch"
+name = "GapHeuristicSearch"
 uuid = "8ac25eab-7a5f-4d6e-8f8b-34b5831f7ecc"
 authors = ["Eric"]
 version = "0.1.0"
