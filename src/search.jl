@@ -1,10 +1,3 @@
-using POMDPs
-using POMDPTools  # Updated to use POMDPTools instead of POMDPModelTools and POMDPPolicies
-using POMDPSimulators  # Added for simulation functions
-using Random
-using DataStructures
-using Parameters
-using LinearAlgebra
 """
 Belief node type for the belief search tree. 
 """
