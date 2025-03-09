@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+          julia -e 'using Pkg; Pkg.activate("."); Pkg.resolve(); Pkg.instantiate(); Pkg.precompile()'
 
       - name: Debug Dependencies
         run: |
