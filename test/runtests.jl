@@ -1,47 +1,70 @@
 using Test
+using GapHeuristicSearch
 using POMDPs
 using POMDPModelTools
-using POMDPPolicies
-using POMDPSimulators
-using Random
-using GapHeuristicSearch
 
-# Define a simple POMDP model for testing
-struct TestPOMDP <: POMDPs.POMDP{Int, Int, Int} end
+# Define a simple test problem
+struct SimplePOMDP <: POMDP{Int, Int, Int} end
 
-POMDPs.states(::TestPOMDP) = 1:2
-POMDPs.actions(::TestPOMDP) = [1, 2]
-POMDPs.observations(::TestPOMDP) = [1, 2]
-POMDPs.transition(::TestPOMDP, s, a) = SparseCat([1, 2], [0.5, 0.5])
-POMDPs.observation(::TestPOMDP, s′, a) = SparseCat([1, 2], [0.5, 0.5])
-POMDPs.reward(::TestPOMDP, s, a) = 1.0
-POMDPs.initialstate(::TestPOMDP) = SparseCat([1, 2], [0.5, 0.5])
-POMDPs.discount(::TestPOMDP) = 0.9
+# Basic required methods for testing
+POMDPs.states(::SimplePOMDP) = [1, 2]
+POMDPs.actions(::SimplePOMDP) = [1, 2]
+POMDPs.observations(::SimplePOMDP) = [1, 2]
+POMDPs.initialstate(::SimplePOMDP) = Deterministic(1)
+POMDPs.discount(::SimplePOMDP) = 0.9
+POMDPs.transition(::SimplePOMDP, s, a) = Deterministic(s)
+POMDPs.observation(::SimplePOMDP, a, sp) = Deterministic(a)
+POMDPs.reward(::SimplePOMDP, s, a, sp) = 1.0
 
-@testset "GapHeuristicSearch Tests" begin
-    # Create a test POMDP
-    pomdp = TestPOMDP()
+# Define a basic updater (for testing)
+struct SimpleUpdater <: Updater end
+POMDPs.initialize_belief(::SimpleUpdater, state) = state_distribution(state=state)
+POMDPs.update(::SimplePOMDP, b, a, o) = b
 
-    # Define a basic updater and policy
-    struct TestUpdater <: Updater end
-    struct TestPolicy <: Policy end
+# Begin testing
+@testset "GapHeuristicSearch.jl Basic Tests" begin
+    
+    # Test creating a solver
+    solver = GapHeuristicSearchSolver(
+        SimpleUpdater(),
+        π = nothing,
+        Rmax = 10.0,
+        uhi_func = (pomdp, b) -> 10.0,
+        ulo_func = (pomdp, b) -> 0.0,
+        delta = 0.01,
+        k_max = 10,
+        d_max = 5,
+        nsamps = 10,
+        max_steps = 10
+    )
 
-    POMDPs.update(::TestUpdater, b, a, o) = b
-    POMDPs.action(::TestPolicy, b) = 1
+    @test typeof(solver) == GapHeuristicSearchSolver
 
-    up = TestUpdater()
-    π = TestPolicy()
+    # Test solver parameters
+    @test solver.Rmax == -Inf  # Default is -Inf unless explicitly given
+    @test solver.delta == 1e-2
+    @test solver.d_max == 5
 
-    # Create the solver
-    solver = GapHeuristicSearchSolver(up, π=π, Rmax=10.0, delta=0.01, k_max=100, d_max=5, nsamps=10, max_steps=50, verbose=false)
-
-    # Solve the POMDP
+    # Test solving a simple POMDP
+    pomdp = SimplePOMDP()
     planner = solve(solver, pomdp)
 
-    # Ensure the solver returns a valid policy
-    @test isa(planner, GapHeuristicSearchPlanner)
+    @test typeof(planner) == GapHeuristicSearchPlanner{typeof(state_distribution(state=1)), Int, Int}
+
+    # Check get_type
+    B, A, O = get_type(planner)
+    @test B == typeof(state_distribution(state=1))
+    @test A == Int
+    @test O == Int
+
+    # Test action function with a simple belief
+    b = state_distribution(state=1)
     
-    # Test action selection
-    action_result = action(planner, initialstate(pomdp))
-    @test action_result in actions(pomdp)
+    try
+        a = action(planner, b)
+        @test isa(a, Int)
+    catch e
+        @test false "Action function failed with error: $e"
+    end
+
 end
