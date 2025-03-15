@@ -1,12 +1,12 @@
 using Test
 using GapHeuristicSearch
 using POMDPs
-using POMDPTools
+using POMDPModelTools
 
 # Define a simple test problem
 struct SimplePOMDP <: POMDP{Int, Int, Int} end
 
-# Required methods for SimplePOMDP
+# Basic required methods for testing
 POMDPs.states(::SimplePOMDP) = [1, 2]
 POMDPs.actions(::SimplePOMDP) = [1, 2]
 POMDPs.observations(::SimplePOMDP) = [1, 2]
@@ -16,14 +16,15 @@ POMDPs.transition(::SimplePOMDP, s, a) = Deterministic(s)
 POMDPs.observation(::SimplePOMDP, a, sp) = Deterministic(a)
 POMDPs.reward(::SimplePOMDP, s, a, sp) = 1.0
 
-# Define a basic updater for testing
+# Define a basic updater (for testing)
 struct SimpleUpdater <: Updater end
-POMDPs.initialize_belief(::SimpleUpdater, state) = Deterministic(state)
-POMDPs.update(::SimpleUpdater, b, a, o) = b
+POMDPs.initialize_belief(::SimpleUpdater, state) = state_distribution(state=state)
+POMDPs.update(::SimplePOMDP, b, a, o) = b
 
+# Begin testing
 @testset "GapHeuristicSearch.jl Basic Tests" begin
     
-    # Test solver creation
+    # Test creating a solver
     solver = GapHeuristicSearchSolver(
         SimpleUpdater(),
         π = nothing,
@@ -37,28 +38,32 @@ POMDPs.update(::SimpleUpdater, b, a, o) = b
         max_steps = 10
     )
 
-    @test isa(solver, GapHeuristicSearchSolver)
+    @test typeof(solver) == GapHeuristicSearchSolver
 
-    # Test solving the simple POMDP
+    # Test solver parameters
+    @test solver.Rmax == -Inf  # Default is -Inf unless explicitly given
+    @test solver.delta == 1e-2
+    @test solver.d_max == 5
+
+    # Test solving a simple POMDP
     pomdp = SimplePOMDP()
     planner = solve(solver, pomdp)
 
-    @test isa(planner, GapHeuristicSearchPlanner)
+    @test typeof(planner) == GapHeuristicSearchPlanner{typeof(state_distribution(state=1)), Int, Int}
 
     # Check get_type
     B, A, O = get_type(planner)
-    @test B == Deterministic{Int}
+    @test B == typeof(state_distribution(state=1))
     @test A == Int
     @test O == Int
 
-    # Test action function with basic belief
-    b = Deterministic(1)
-
+    # Test action function with a simple belief
+    b = state_distribution(state=1)
+    
     try
-        a = action(planner, b)
-        @test isa(a, Int)
-    catch e
-        @warn "Action test failed" exception=(e, catch_backtrace())
-        @test false
-    end
+    a = action(planner, b)
+    @test isa(a, Int)
+catch e
+    @warn "Action test failed:" exception=(e, catch_backtrace())
+    @test false
 end
