@@ -61,10 +61,10 @@ POMDPs.update(::SimplePOMDP, b, a, o) = b
     b = state_distribution(state=1)
     
     try
-        a = action(planner, b)
-        @test isa(a, Int)
-    catch e
-        @test false "Action function failed with error: $e"
-    end
-
+    a = action(planner, b)
+    @test isa(a, Int)
+catch e
+    @warn "Action test failed:" exception=(e, catch_backtrace())
+    @test false
 end
+
