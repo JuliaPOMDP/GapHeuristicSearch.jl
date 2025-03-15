@@ -11,9 +11,3 @@ POMDPTools = "706fcdb9-5a56-5b75-954e-ff973d2e03a4"
 POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-
-[extras]
-Test = "8dfed614-7b6b-5e8f-86fd-cdb5a263bf21"
-
-[targets]
-test = ["Test"]
