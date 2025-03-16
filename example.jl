@@ -1,5 +1,7 @@
 using POMDPs
-using POMDPTools
+using POMDPPolicies
+using POMDPSimulators
+using POMDPModels
 using BeliefUpdaters
 using GapHeuristicSearch
 
