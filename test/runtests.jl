@@ -41,40 +41,29 @@ POMDPs.update(::SimpleUpdater, b, a, o) = b
 
     @test isa(solver, GapHeuristicSearchSolver)
 
-    # Test solver parameters
+    # Test solver parameters explicitly
     @test solver.Rmax == 10.0
     @test solver.delta == 0.01
     @test solver.d_max == 5
 
-    # Attempt solving the simple POMDP, with proper error catching
-    planner = nothing
+    # Test planner initialization
+    pomdp = SimplePOMDP()
+    planner = solve(solver, pomdp)
+    @test isa(planner, GapHeuristicSearchPlanner)
+
+    # Ensure correct belief type
+    B, A, O = get_type(planner)
+    @test B <: Deterministic
+    @test A == Int
+    @test O == Int
+
+    # Test action method explicitly
     try
-        pomdp = SimplePOMDP()
-        planner = solve(solver, pomdp)
-        @test isa(planner, GapHeuristicSearchPlanner)
-    catch e
-        @warn "Solver failed: $e" exception=(e, catch_backtrace())
-        @test false
-    end
-
-    # Only run further tests if planner initialized correctly
-    if planner !== nothing
-        # Test get_type
-        B, A, O = get_type(planner)
-        @test B == Deterministic{Int}
-        @test A == Int
-        @test O == Int
-
-        # Test action function explicitly
         b = Deterministic(1)
-        try
-            a = action(planner, b)
-            @test isa(a, Int)
-        catch e
-            @warn "Action function failed: $e" exception=(e, catch_backtrace())
-            @test false
-        end
-    else
-        @warn "Planner initialization failed, skipping further tests."
+        a = action(planner, b)
+        @test isa(a, Int)
+    catch e
+        @warn "Action function failed" exception=(e, catch_backtrace())
+        @test false
     end
 end
