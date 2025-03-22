@@ -1,7 +1,6 @@
 using POMDPs
 using POMDPTools
 using BeliefUpdaters
-
 using GapHeuristicSearch
 
 cryingbaby = BabyPOMDP()
