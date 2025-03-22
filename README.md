@@ -1,4 +1,4 @@
-# GHS.jl
+# GapHeuristicSearch.jl
 
 [![CI](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl/graph/badge.svg)](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl)
