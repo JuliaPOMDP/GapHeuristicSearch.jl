@@ -28,20 +28,22 @@ jobs:
         run: |
           julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
 
-      - name: Add Suppressor Dependency
+      - name: Add Coverage Dependency
         run: |
-          julia --project -e 'using Pkg; Pkg.add("Suppressor")'
+          julia --project -e 'using Pkg; Pkg.add("Coverage")'
 
-      - name: Run Tests (Hide Warnings)
+      - name: Run Tests and Generate Coverage
         run: |
-          julia --project --warn-overwrite=no -e '
-            using Pkg, Suppressor;
-            @suppress_err begin
-              Pkg.test(coverage=true)
-            end'
+          julia --project -e '
+            using Pkg;
+            Pkg.test(coverage=true);
+            using Coverage;
+            LCOV.writefile("lcov.info", process_folder("."))
+          '
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Aero-Spec/GapHeuristicSearch.jl
+          files: lcov.info
