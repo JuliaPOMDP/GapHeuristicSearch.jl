@@ -1,8 +1,14 @@
-# GHS.jl
+# GapHeuristicSearch.jl
+
+[![CI](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl/graph/badge.svg)](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl)
+
+---
+
 A Julia implementation of the Gap Heuristic Search online planning algorithm, for use with the POMDPs.jl ecosystem. 
 
 ## Installation
-In Julia, type `]add MCTS`
+In Julia, type `]add GapHeuristicSearch`
 
 ## Documentation
 The difference between the gap at a belief b is defined as the difference between the upper and lower bound values: U<sub>upper</sub>(b)-U<sub>lower</sub>(b).
@@ -23,7 +29,7 @@ using POMDPs
 using POMDPModels # for the CryingBaby problem
 using POMDPPolicies
 using BeliefUpdaters
-using GHS
+using GapHeuristicSearch
 
 pomdp = BabyPOMDP()
 roller = RandomPolicy(pomdp)
