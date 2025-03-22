@@ -38,15 +38,13 @@ Rmax = 0.0  # best possible reward is baby not hungry, didnt feed
 solver = GapHeuristicSearchSolver(roller,
                                 up,
                                 Rmax,
-                                delta=.1,
+                                delta=0.1,
                                 k_max=100,
                                 d_max=10,
                                 nsamps=10,
                                 max_steps=20)
                                 
-ghs_policy = solve(solver, cryingbaby)
-
-b_hungry = DiscreteBelief(cryingbaby,[.1,.9])
-
-a = action(ghs_policy, b_hungry)
+policy = solve(solver, cryingbaby)
+b = DiscreteBelief(cryingbaby,[0.1,0.9])
+a = action(policy, b)
 ```
