@@ -22,9 +22,9 @@ o = argmax(o -> Uhi[B[(a,o)]] - Ulo[B[(a,o)]], 𝒪) # find the observation that
 The exploration stops when the gap is smaller than the threshold $\delta$ or the maximum depth
 is reached. 
 ## Usage
-```julia
-If `pomdp` is a POMDP defined with the [POMDPs.jl](https://github.com/sisl/POMDPs.jl) interface, the GHS solver can be used to find an optimized action, `a`, for the POMDP in belief state `b` as follows:
 
+If `pomdp` is a POMDP defined with the [POMDPs.jl](https://github.com/sisl/POMDPs.jl) interface, the GHS solver can be used to find an optimized action, `a`, for the POMDP in belief state `b` as follows:
+```julia
 using POMDPs
 using POMDPModels # for the CryingBaby problem
 using POMDPPolicies
