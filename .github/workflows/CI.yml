@@ -28,6 +28,10 @@ jobs:
         run: |
           julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
 
-      - name: Run Tests
+      - name: Run Tests (Hide Warnings)
         run: |
-          julia --project -e 'using Pkg; Pkg.test()'
+          julia --project --warn-overwrite=no -e '
+            using Pkg, Suppressor;
+            @suppress_err begin
+              Pkg.test()
+            end'
