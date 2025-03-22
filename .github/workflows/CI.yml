@@ -21,10 +21,13 @@ jobs:
         with:
           version: '1.9'
 
+      - name: Update Julia Registries
+        run: julia -e 'using Pkg; Pkg.Registry.update()'
+
       - name: Install Dependencies
         run: |
-          julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+          julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
 
       - name: Run Tests
         run: |
-          julia -e 'using Pkg; Pkg.activate("."); Pkg.test()'
+          julia --project -e 'using Pkg; Pkg.test()'
