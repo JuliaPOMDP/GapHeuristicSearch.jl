@@ -1,7 +1,10 @@
+# GHS.jl
+
 [![CI](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/Aero-Spec/GapHeuristicSearch.jl/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl/graph/badge.svg)](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl)
 
-# GHS.jl
+---
+
 A Julia implementation of the Gap Heuristic Search online planning algorithm, for use with the POMDPs.jl ecosystem. 
 
 ## Installation
