@@ -37,5 +37,11 @@ jobs:
           julia --project --warn-overwrite=no -e '
             using Pkg, Suppressor;
             @suppress_err begin
-              Pkg.test()
+              Pkg.test(coverage=true)
             end'
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: lcov.info
