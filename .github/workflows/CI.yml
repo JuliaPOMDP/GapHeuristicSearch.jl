@@ -40,8 +40,8 @@ jobs:
               Pkg.test(coverage=true)
             end'
 
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: lcov.info
+          slug: Aero-Spec/GapHeuristicSearch.jl
