@@ -1,7 +1,7 @@
 using Test
 using GapHeuristicSearch
 using POMDPs
-using POMDPModelTools
+using POMDPTools
 
 # Define simple test POMDP type
 struct SimplePOMDP <: POMDP{Int, Int, Int} end
