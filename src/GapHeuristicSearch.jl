@@ -2,12 +2,10 @@ module GapHeuristicSearch
 
 using POMDPs
 using POMDPTools
-using POMDPPolicies
-using POMDPSimulators
-using Random
 using Parameters
 using DataStructures
 using LinearAlgebra
+using Random
 using POMDPLinter: @show_requirements, requirements_info, @POMDP_require, @req, @subreq
 import POMDPLinter
 
