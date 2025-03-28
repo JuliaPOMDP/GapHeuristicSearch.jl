@@ -1,14 +1,14 @@
 # GapHeuristicSearch.jl
 
-[![CI](https://github.com/sisl/GapHeuristicSearch.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/sisl/GapHeuristicSearch.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl/graph/badge.svg)](https://codecov.io/github/Aero-Spec/GapHeuristicSearch.jl)
+[![CI](https://github.com/JuliaPOMDP/GapHeuristicSearch.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaPOMDP/GapHeuristicSearch.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/github/JuliaPOMDP/GapHeuristicSearch.jl/graph/badge.svg)](https://codecov.io/github/JuliaPOMDP/GapHeuristicSearch.jl)
 
 ---
 
 A Julia implementation of the Gap Heuristic Search online planning algorithm, for use with the POMDPs.jl ecosystem. 
 
 ## Installation
-In Julia, type `]add https://github.com/sisl/GapHeuristicSearch.jl`
+In Julia, type `]add https://github.com/JuliaPOMDP/GapHeuristicSearch.jl`
 
 ## Documentation
 The difference between the gap at a belief b is defined as the difference between the upper and lower bound values: U<sub>upper</sub>(b)-U<sub>lower</sub>(b).
