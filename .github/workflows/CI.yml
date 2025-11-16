@@ -32,4 +32,3 @@ jobs:
         with:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: JuliaPOMDP/GapHeuristicSearch.jl
